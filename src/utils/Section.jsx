@@ -7,24 +7,19 @@ const LEFT_MARGIN = '1rem';
 const styles = {
   content: {
     padding: `0 0 0 ${LEFT_MARGIN}`,
-    // width: '100%'
   },
   header: {
     backgroundColor: 'black',
-    // width: '100%'
   },
   title: {
     color: 'white',
-    // padding: `0 ${-LEFT_MARGIN} 0 ${LEFT_MARGIN}`,
-    padding: '.4rem 0 .4rem',
-    // width: '100%'
+    padding: '.5rem 0 .5rem .5rem',
   },
   subtitle: {
     color: '#d1d2d3',
     fontSize: '0.75rem',
     fontWeight: '300',
     paddingLeft: '.9em',
-    // width: '100%'
   },
 };
 const Section = ({
