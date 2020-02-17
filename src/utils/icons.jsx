@@ -17,7 +17,6 @@ import AccountIconInternal from '@material-ui/icons/PersonOutline';
 import LogoutIconInternal from '@material-ui/icons/ExitToApp';
 import StarBorderInternal from '@material-ui/icons/StarBorder';
 
-import githubMark from '../static/GitHub-Mark.png';
 
 const iconStyle = { verticalAlign: 'baseline', margin: '0 .2rem 0 .2rem' };
 const HomeIcon = () => <HomeIconInternal style={iconStyle} />;
@@ -125,14 +124,6 @@ const StarIcon = () => (
 );
 
 
-const GithubIcon = () => (
-  <img
-    src={githubMark}
-    alt="octo-cat"
-    style={{ verticalAlign: 'top', width: '1.5rem' }}
-  />
-);
-
 export {
   AccountIcon,
   AndroidIcon,
@@ -143,7 +134,6 @@ export {
   CopyIcon,
   DesktopIcon,
   DetailsIcon,
-  GithubIcon,
   HelpIcon,
   HomeIcon,
   ImageIcon,

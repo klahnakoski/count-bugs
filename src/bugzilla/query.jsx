@@ -1,11 +1,12 @@
 import { fetchJson, URL } from '../vendor/requests';
 import {
-  coalesce, first, missing, toArray,
+  coalesce, exists, first, missing, toArray,
 } from '../vendor/utils';
 import { Log } from '../vendor/logs';
 import { selectFrom, toPairs } from '../vendor/vectors';
 import { Data } from '../vendor/datas';
 import { escapeRegEx } from '../vendor/convert';
+import { collate } from '../vendor/jx/utils';
 
 const BUGZILLA_URL = 'https://bugzilla.mozilla.org/buglist.cgi';
 const BUGZILLA_REST = 'https://bugzilla.mozilla.org/rest/bug';
@@ -81,7 +82,7 @@ Data.setDefault(expressionLookup, {
     ];
   },
   eq(expr) {
-    const patterns = Object.entries(expr.eq);
+    const patterns = Object.entries(coalesce(expr.eq, expr.in, expr.term, expr.terms));
 
     if (patterns.length > 1) {
       return [
@@ -96,10 +97,18 @@ Data.setDefault(expressionLookup, {
 
     if (vals.length > 1) {
       return [
-        { f: 'OP', j: 'OR' },
-        ...val.map(v => ({ f: fld, o: 'equals', v })),
-        { f: 'CP' },
+        {
+          f: fld,
+          o: 'anyexact',
+          v: vals.join(','),
+        },
       ];
+
+      // return [
+      //   { f: 'OP', j: 'OR' },
+      //   ...val.map(v => ({ f: fld, o: 'equals', v })),
+      //   { f: 'CP' },
+      // ];
     }
 
     return [
@@ -227,26 +236,91 @@ const jx2rest = expr => {
   return output;
 };
 
-/*
-send json query expression to Bugzilla
- */
-const queryBugzilla = async query => {
+
+const simpleQueryBugzilla = async query => {
+  /*
+  send json query expression to Bugzilla
+   */
+  const filter = coalesce(query.where, query.filter);
   const url = URL({
     path: BUGZILLA_REST,
     query: {
-      ...jx2rest(coalesce(query.where, query.filter)),
-      include_fields: coalesce(query.select, 'bug_id').join(','),
+      ...jx2rest(filter),
+      include_fields: toArray(coalesce(query.select, 'bug_id')).join(','),
       order: coalesce(query.sort, 'bug_id'),
     },
   });
 
-  return fetchJson(url);
+  const response = await fetchJson(url);
+  return response.bugs;
 };
 
-/*
-open a window to show given bugs
- */
+
+const getBlockers = async bugId => {
+  /*
+  GET ALL THE BLOCKING BUGS, RECURSIVELY
+   */
+  let bugs = toArray(bugId);
+  let newBugs = bugs;
+  while (newBugs.length > 0) {
+    const query = {
+      select: 'depends_on',
+      where: { eq: { bug_id: newBugs } },
+    };
+    // eslint-disable-next-line no-await-in-loop
+    const children = await simpleQueryBugzilla(query);
+    newBugs = selectFrom(children)
+      .select('depends_on')
+      .flatten()
+      .subtract(bugs)
+      .union()
+      .toArray();
+    bugs = selectFrom(bugs)
+      .append(...newBugs)
+      .union()
+      .sort()
+      .toArray();
+  }
+  return bugs;
+};
+
+
+const queryBugzilla = async query => {
+  /*
+  send json query expression to Bugzilla
+   */
+  const filter = coalesce(query.where, query.filter);
+  // THE root FIELD IS SPECIAL: IT IS CONSIDERED RECURSIVE
+  const collated = collate(filter, ['root']);
+  const result = await Promise.all(collated.map(async pair => {
+    const [root, filter] = pair;
+
+    if (exists(root)) {
+      if (missing(root.eq)) {
+        Log.error('expecting {"eq":{"root": bugs}}');
+      }
+      const blockers = await getBlockers(root.eq.root);
+      const url = URL({
+        path: BUGZILLA_REST,
+        query: {
+          ...jx2rest({ and: [{ in: { bug_id: blockers } }, filter] }),
+          include_fields: coalesce(query.select, 'bug_id').join(','),
+          order: coalesce(query.sort, 'bug_id'),
+        },
+      });
+
+      const result = await fetchJson(url);
+      return result.bugs;
+    }
+    return simpleQueryBugzilla(query);
+  }));
+  return selectFrom(result).flatten().toArray();
+};
+
 const showBugsUrl = query => URL({
+  /*
+  open a window to show given bugs
+   */
   path: BUGZILLA_URL,
   query: {
     ...jx2rest(coalesce(query.where, query.filter)),

@@ -10,10 +10,10 @@ const getBugsData = async (queries = [], timeDomain) => {
   const bugSeries = await Promise.all(
     queries.map(async ({ label, filter }) => ({
       label,
-      ...(await queryBugzilla({
+      bugs: await queryBugzilla({
         select: ['cf_last_resolved', 'creation_time'],
         where: filter,
-      })),
+      }),
     })),
   );
   const eod = Date.eod();

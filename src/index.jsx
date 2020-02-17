@@ -5,8 +5,6 @@ import { AppContainer } from 'react-hot-loader';
 import './index.css';
 import Routes from './routes';
 
-require('typeface-roboto');
-
 class GlobalErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

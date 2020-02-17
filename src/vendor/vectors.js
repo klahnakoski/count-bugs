@@ -419,10 +419,10 @@ class ArrayWrapper {
     );
   }
 
-  /*
-  return just the unique values
-   */
   union() {
+    /*
+    return just the unique values
+     */
     const result = new Set([...this]);
 
     return new ArrayWrapper(
@@ -431,6 +431,13 @@ class ArrayWrapper {
       },
       { debug: false },
     );
+  }
+
+  subtract(values) {
+    /*
+    return elements not in values
+     */
+    return this.filter(x => !values.includes(x));
   }
 
   append(...values) {

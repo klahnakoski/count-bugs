@@ -5,6 +5,7 @@ import { Template } from '../vendor/Template';
 import { GMTDate as Date, ISO_8601 } from '../vendor/dates';
 import { selectFrom } from '../vendor/vectors';
 import { coalesce } from '../vendor/utils';
+import { collate } from '../vendor/jx/utils';
 
 // EXAMPLE https://github.com/mozilla-mobile/fenix/labels/eng%3Aperformance
 const GITHUB_ISSUES = new Template('https://api.github.com/repos/{{owner}}/{{repo}}/issues');
@@ -58,5 +59,29 @@ async function getIssues({ timeDomain }) {
   };
 }
 
+const GITHUB_PROJECT_COLUMNS = new Template('https://api.github.com/repos/{{owner}}/{{repo}}/projects/{{project}}/columns');
+const GITHUB_PROJECT_CARDS = new Template('https://api.github.com/repos/{{owner}}/{{repo}}/projects/columns/{{column}}/cards');
 
-export { getIssues }; // eslint-disable-line import/prefer-default-export
+async function getProjectCards(filter) {
+  const collated = collate(filter, ['owner', 'repo', 'project']);
+
+  const cards = await Promise.all(collated.map(async ([owner, repo, project, filter]) => {
+    // get all columns from owner, repo, project
+    const get_columns_url = URL({
+      path: GITHUB_PROJECT_COLUMNS.expand({ owner, repo, project }),
+      query: filter,
+    });
+    const columns = await fetchJson(get_columns_url);
+    return columns.map(async column => {
+      const { id } = await column;
+      const get_cards_url = GITHUB_PROJECT_CARDS.expand({
+        owner, repo, project, column: id,
+      });
+      return fetchJson(get_cards_url);
+    });
+  }));
+
+  return cards;
+}
+
+export { getIssues, getProjectCards };
