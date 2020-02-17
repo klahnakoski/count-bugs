@@ -1,0 +1,6 @@
+.idea
+*.iml
+.svn
+
+/yarn-error.log
+node_modules
