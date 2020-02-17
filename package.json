@@ -6,26 +6,14 @@
     "build": "webpack --mode production",
     "start": "webpack-dev-server --mode development --disable-host-check",
     "start:local": "BACKEND=http://localhost:3000 webpack-dev-server --mode development",
-    "test": "jest",
-    "lint": "eslint --cache --ext mjs,jsx,js --format codeframe \".*.js\" src test",
-    "coverage": "nyc --all jest --collectCoverage",
-    "coveralls": "rm -rf .nyc_output/ && yarn coverage && nyc report --reporter=text-lcov | coveralls",
-    "heroku-postbuild": "yarn build"
-  },
-  "nyc": {
-    "include": [
-      "src/**"
-    ],
-    "extension": [
-      ".jsx"
-    ]
+    "lint": "eslint --cache --ext mjs,jsx,js --format codeframe \".*.js\" src test"
   },
   "lint-staged": {
     "*.js[x]": [
       "yarn lint"
     ]
   },
-  "author": "Harald Kirschner <npm@digitarald.com> (http://digitarald.de/)",
+  "author": "Kyle Lahnakoski <kyle@lahnakoski.com>",
   "license": "MPL-2.0",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.4",
@@ -36,18 +24,13 @@
     "@material-ui/lab": "^3.0.0-alpha.30",
     "aggregatejs": "^0.0.5",
     "chart.js": "chartjs/Chart.js#7c3e934",
-    "classnames": "^2.2.5",
-    "d3": "^5.0.0",
-    "jest-extended": "^0.11.2",
     "lodash": "^4.17.12",
-    "moment": "^2.19.3",
     "prop-types": "^15.6.2",
     "query-string": "^6.0.0",
     "react": "^16.6.3",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "^16.6.3",
     "react-hot-loader": "^4.3.6",
-    "react-metrics-graphics": "^1.0.2",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-simple-tooltip": "^2.6.0"
@@ -56,17 +39,13 @@
     "@mozilla-frontend-infra/react-lint": "^2.0.0",
     "@neutrinojs/airbnb": "^9.0.0-rc.3",
     "@neutrinojs/copy": "^9.0.0-rc.3",
-    "@neutrinojs/jest": "^9.0.0-rc.3",
     "@neutrinojs/react": "^9.0.0-rc.3",
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
     "eslint": "5.16.0",
     "husky": "^3.0.0",
-    "jest": "^25.0.0",
     "lint-staged": "^9.0.0",
     "neutrino": "^9.0.0-rc.3",
-    "nyc": "^11.6.0",
-    "react-test-renderer": "^16.5.2",
     "webpack": "^4",
     "webpack-cli": "^3",
     "webpack-dev-server": "^3"

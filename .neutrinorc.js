@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const airbnb = require('@neutrinojs/airbnb');
 const react = require('@neutrinojs/react');
-const jest = require('@neutrinojs/jest');
 const copy = require('@neutrinojs/copy');
 
 module.exports = {
@@ -46,9 +45,6 @@ module.exports = {
       // This is the key to making React Router work with neutrino
       // Fix issue with nested routes e.g /index/garbage
       publicPath: '/',
-    }),
-    jest({
-      setupFilesAfterEnv: ['jest-extended'],
     }),
     copy({
       patterns: [
