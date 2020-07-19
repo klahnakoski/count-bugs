@@ -24,7 +24,7 @@
     "@material-ui/lab": "^3.0.0-alpha.30",
     "aggregatejs": "^0.0.5",
     "chart.js": "chartjs/Chart.js#7c3e934",
-    "lodash": "^4.17.12",
+    "lodash": "^4.17.19",
     "prop-types": "^15.6.2",
     "query-string": "^6.0.0",
     "react": "^16.6.3",
