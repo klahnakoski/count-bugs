@@ -1,3 +1,5 @@
+# this repo is now archived
+
 # count-bugs
 
 Show bugs from multiple repositories
